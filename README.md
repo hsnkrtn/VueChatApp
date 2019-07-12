@@ -1,4 +1,4 @@
-# vue-cli
+# chat-app-vue
 
 > A Vue.js project
 
