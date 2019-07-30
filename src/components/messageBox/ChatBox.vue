@@ -6,7 +6,7 @@
     </div>
     <hr>
     
-    <chat-container :currentUser="currentUser"/>
+    <chat-container :currentUser="currentUser" :messages="messagesBetweenCurrentUser"/>
   </div>
 </template>
 
@@ -22,6 +22,11 @@ export default {
     currentUser: {
       Type: Object,
       required: true
+    },
+    messagesBetweenCurrentUser: {
+      Type: Array,
+      required: false,
+      default:()=>([])
     }
   },
   computed: {
@@ -35,7 +40,7 @@ export default {
       return {
         [_className]: true,
         [`${_className}--woman`]: this.currentUser.gender == "Woman",
-        [`${_className}--man`]: this.currentUser.gender == "Man"
+        [`${_className}--man`]: this.currentUser.gender == "Man",
       };
     }
   }
