@@ -1,10 +1,7 @@
 <template>
   <div class="chat-container">
     <ul class="messages">
-      <li class="message">Message</li>
-      <li class="message">Message</li>
-      <li class="message">Message</li>
-      <li class="message">Message</li>
+      <li class="message" v-for="(message,index) in messages" :key="index">{{message}}</li>
     </ul>
     <message-box />
   </div>
@@ -17,6 +14,13 @@ export default {
   components: {
     Message,
     MessageBox
+  },
+  props:{
+    messages:{
+      type:Array,
+      required:false,
+      default:()=>([])
+    }
   }
 };
 </script>
