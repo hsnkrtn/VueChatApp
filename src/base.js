@@ -11,5 +11,6 @@ let storage = app.storage();
 let db = app.database();
 let usersRef = db.ref("users");
 let publicMessagesRef = db.ref("publicMessages");
-export {app, storage,db, usersRef, publicMessagesRef}
+let typingNow = db.ref("typingNow");
+export {app, storage,db, usersRef, typingNow}
 export default app;
