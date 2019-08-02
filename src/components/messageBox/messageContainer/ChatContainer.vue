@@ -1,7 +1,7 @@
 <template>
   <div class="chat-container">
     <ul class="messages">
-      <li class="message" v-for="(message,index) in messages" :key="index">{{message}}</li>
+      <li class="message" v-for="(message,index) in messages" :key="index">{{message.from}}{{message.text}}</li>
     </ul>
     <message-box />
   </div>

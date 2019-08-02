@@ -3,6 +3,7 @@
     <img class="user__avatar" :src="user.avatarUrl || defaultAvatar" alt="resim iste">
     <span :class="genderClass">{{user.userName}}</span>
     <span class="user__age">{{age}}</span>
+    <span v-if="isTypingToMe">... Typing</span>
   </li>
 </template>
 
@@ -16,6 +17,9 @@ export default {
       type: Object,
       required: false,
       default: () => ({})
+    },
+    isTypingToMe:{
+      type:Boolean
     }
   },
   computed: {
@@ -46,32 +50,32 @@ export default {
   padding: 20px;
   justify-content: space-between;
   align-items: center;
-  background-color: black;
+  background-color: #c5df42;
   list-style: none;
   &__name {
     text-align: right;
-    color: greenyellow;
+    color: black;
     &--man {
       &::after {
         content: " \2642";
         font-weight: bold;
         float: right;
-        color: yellow;
+        color: black;
         padding-right: 5px;
       }
     }
     &--woman {
       &::after {
-        content: " \2640";
         font-weight: bold;
         float: right;
-        color: pink;
+        color: black;
         padding-right: 5px;
+        content: " \2640";
       }
     }
   }
   &__age {
-    color: greenyellow;
+    color: black;
   }
   &__avatar {
     border-radius: 20%;
@@ -81,9 +85,8 @@ export default {
   }
   &:hover {
     cursor: pointer;
-    &::after {
-      content: "bakma lann";
-    }
+     background-color: #dbf84a;
+
   }
 }
 </style>

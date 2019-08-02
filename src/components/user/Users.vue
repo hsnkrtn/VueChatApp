@@ -5,6 +5,7 @@
       v-for="(user,index) in users"
       :key="index"
       :user="user"
+      :isTypingToMe="isTypingToMe(user)"
     />
   </ul>
 </template>
@@ -21,12 +22,19 @@ export default {
       type: Array,
       required: false,
       default: () => []
+    },
+    usersTypingToMe: {
+      type: Array,
+      required: false,
+      default: () => []
     }
   },
   methods: {
     setCurrentConversationWith(user) {
       this.$emit("currentUserChanged", user);
-      console.log("kime tikladin lann", user);
+    },
+    isTypingToMe(user){
+      return this.usersTypingToMe.filter(a=>a.isTyping===user.userName).length
     }
   }
 };

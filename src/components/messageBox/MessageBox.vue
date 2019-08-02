@@ -2,7 +2,6 @@
   <div class="message-box">
     <textarea
       class="message-box__text-box"
-      @change="isTypingNow"
       v-model="message"
       name="Text1"
       cols="20"
@@ -14,21 +13,37 @@
 
 <script>
 import { EventBus } from "../../helpers/EventBus/EventBus";
+import Guid from "guid";
 export default {
   data() {
     return {
       message: null,
+      id: null,
       isTyping: false
     };
   },
   methods: {
     sendMessage() {
-      if (this.message) EventBus.$emit("messageReadyToSend", this.message);
-      this.message = null;
-      EventBus.$emit("typingDone");
+      if (this.message)
+      EventBus.$emit("typingDone", this.id);
+        EventBus.$emit("messageReadyToSend", this.message);
+        this.reset()
     },
-    isTypingNow() {
-      EventBus.$emit("isTypingNow");
+    reset(){
+      this.isTyping=false;
+      this.message = null;
+      this.id=null;
+    }
+  },
+  watch: {
+    message(newVal) {
+      if (newVal) this.isTyping = true;
+    },
+    isTyping(newVal) {
+      if (newVal) {
+      this.id = Guid.raw();
+        EventBus.$emit("isTypingNow", this.id);
+      }
     }
   }
 };
