@@ -2,11 +2,11 @@
   <div class="chatbox">
     <div :class="genderClass">
       <h2 class="chatbox__username">{{currentUser.userName}}</h2>
-      <img class="chatbox__avatar" :src="currentUser.avatarUrl || defaultAvatar" alt="image">
+      <img class="chatbox__avatar" :src="currentUser.avatarUrl || defaultAvatar" alt="image" />
     </div>
-    <hr>
-    
-    <chat-container :currentUser="currentUser" :messages="messagesBetweenCurrentUser"/>
+    <hr />
+
+    <chat-container :currentUser="currentUser" :messages="messagesBetweenCurrentUser" />
   </div>
 </template>
 
@@ -26,7 +26,7 @@ export default {
     messagesBetweenCurrentUser: {
       Type: Array,
       required: false,
-      default:()=>([])
+      default: () => []
     }
   },
   computed: {
@@ -40,7 +40,7 @@ export default {
       return {
         [_className]: true,
         [`${_className}--woman`]: this.currentUser.gender == "Woman",
-        [`${_className}--man`]: this.currentUser.gender == "Man",
+        [`${_className}--man`]: this.currentUser.gender == "Man"
       };
     }
   }

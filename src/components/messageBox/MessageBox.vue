@@ -1,12 +1,6 @@
 <template>
   <div class="message-box">
-    <textarea
-      class="message-box__text-box"
-      v-model="message"
-      name="Text1"
-      cols="20"
-      rows="2"
-    ></textarea>
+    <textarea class="message-box__text-box" v-model="message" name="Text1" cols="20" rows="2"></textarea>
     <button @click="sendMessage">Gonder</button>
   </div>
 </template>
@@ -24,15 +18,14 @@ export default {
   },
   methods: {
     sendMessage() {
-      if (this.message)
-      EventBus.$emit("typingDone", this.id);
-        EventBus.$emit("messageReadyToSend", this.message);
-        this.reset()
+      if (this.message) EventBus.$emit("typingDone", this.id);
+      EventBus.$emit("messageReadyToSend", this.message);
+      this.reset();
     },
-    reset(){
-      this.isTyping=false;
+    reset() {
+      this.isTyping = false;
       this.message = null;
-      this.id=null;
+      this.id = null;
     }
   },
   watch: {
@@ -41,9 +34,22 @@ export default {
     },
     isTyping(newVal) {
       if (newVal) {
-      this.id = Guid.raw();
+        this.id = Guid.raw();
         EventBus.$emit("isTypingNow", this.id);
       }
+    },
+    currentUser(newVal) {
+      if (newVal){
+         if (this.message) EventBus.$emit("typingDone", this.id);
+         this.reset();
+      }
+    }
+  },
+  props: {
+    currentUser: {
+      type: Object,
+      required: false,
+      default: () => ({})
     }
   }
 };

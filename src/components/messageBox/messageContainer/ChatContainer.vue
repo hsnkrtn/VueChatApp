@@ -20,6 +20,11 @@ export default {
       type:Array,
       required:false,
       default:()=>([])
+    },
+    currentUser:{
+      type:Object,
+      required:false,
+      default:()=>({})
     }
   }
 };

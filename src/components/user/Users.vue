@@ -6,6 +6,7 @@
       :key="index"
       :user="user"
       :isTypingToMe="isTypingToMe(user)"
+      :numberOfUnSeenMessages="getNumberOfUnSeenMessages(user)"
     />
   </ul>
 </template>
@@ -27,14 +28,25 @@ export default {
       type: Array,
       required: false,
       default: () => []
+    },
+    unSeenMessages: {
+      type: Array,
+      required: false,
+      default: () => []
     }
   },
   methods: {
     setCurrentConversationWith(user) {
       this.$emit("currentUserChanged", user);
     },
-    isTypingToMe(user){
-      return this.usersTypingToMe.filter(a=>a.isTyping===user.userName).length
+    isTypingToMe(user) {
+      return (
+        this.usersTypingToMe.filter(a => a.isTyping === user.userName)
+          .length !== 0
+      );
+    },
+    getNumberOfUnSeenMessages(user) {
+      return this.unSeenMessages.filter(a => a.from === user.userName).length;
     }
   }
 };
