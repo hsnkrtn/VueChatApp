@@ -9,6 +9,7 @@
           :users="users"
           @currentUserChanged="setCurrentUser"
           :usersTypingToMe="usersTypingToMe"
+          :unSeenMessages="unSeenMessages"
         />
       </div>
       <div class="col-md-6">
@@ -41,7 +42,7 @@ import SignUpPage from "./pages/SignUpPage.vue";
 import LoginPage from "./pages/LoginPage.vue";
 import Profile from "./components/profile/Profile.vue";
 import Users from "./components/user/Users";
-import { db, usersRef, publicMessagesRef, storage, typingNow } from "./base";
+import { db, usersRef, storage, typingNow } from "./base";
 import app from "./base";
 import { pathOr, flatten } from "../node_modules/ramda";
 import ChatBox from "./components/messageBox/ChatBox";
@@ -80,13 +81,12 @@ export default {
       publicMessages: [],
       users: [],
       user: {},
-      unReadMessages: [],
-      unReadmessagefrom: [],
       resource: {},
       node: "data",
       currentConversationWith: null,
       peopleTyping: [],
-      messagesBetweenCurrentUserData: []
+      messagesBetweenCurrentUserData: [],
+      unSeenMessages: []
     };
   },
   created() {
@@ -107,6 +107,7 @@ export default {
       });
       this.peopleTyping = typppnow;
     });
+    // get new unread mmessages
   },
   mounted() {
     EventBus.$on("messageReadyToSend", messageToSend => {
@@ -121,6 +122,12 @@ export default {
     EventBus.$on("typingDone", id => {
       typingNow.child(id).remove();
     });
+    // if (this.user) {
+    //   this.unSeenMessages=this.user.messages.filter(a=>!a.gelesen)
+    //   // usersRef.child(`${this.user.key}/messages`).on("value", snap => {
+    //   //   this.unSeenMessages = [...snap.val()]
+    //   // });
+    // }
   },
   methods: {
     IsAlreadyAUser(user) {
@@ -148,7 +155,7 @@ export default {
       this.GetUsers();
       if (this.IsAlreadyAUser(user)) {
         this.IsLogedIn = true;
-        this.user = user;
+        console.log("noluyo lann", user);
       } else {
         this.IsLogedIn = false;
       }
@@ -156,40 +163,36 @@ export default {
     beginWithChat(loginData) {
       this.IsLogedIn = true;
       this.user = loginData.logednInUser;
+      this.unSeenMessages = this.user.messages.filter(a => !a.gelesen);
       this.currentConversationWith = this.users.filter(
         a => a.userName == "public"
       )[0];
-      // this.users = loginData.allUsers;
+
+      // get sync unread
+      usersRef.child(`${this.user.key}/messages`).on("value", snap => {
+        this.unSeenMessages = [...snap.val()].filter(
+          a => !a.gelesen && a.from !== this.currentConversationWith.userName
+        );
+      });
     },
     setCurrentUser(incomingUser) {
       this.currentConversationWith = { ...incomingUser };
-
-      {
-        usersRef.child(`${incomingUser.key}/messages`).on("value", snap => {
-          this.messagesBetweenCurrentUserData = [...snap.val()].filter(
-            a =>
-              (a.to === this.user.userName &&
-                a.from === incomingUser.userName) ||
-              (a.to === incomingUser.userName && a.from === this.user.userName)
-          );
-        });
-      }
     },
     sendMessage(message) {
       let mess = newMessage;
-      mess.Id = Guid.raw();
+      mess.id = Guid.raw();
       mess.from = this.user.userName;
       mess.to = this.currentConversationWith.userName;
       mess.text = message;
       mess.avatarUrl = null;
-      this.sendMessageToMe(mess);
-      this.sendMessageToHim(mess);
+      this.sendMessageToMe({ ...mess, gelesen: true });
+      this.sendMessageToHim({ ...mess });
     },
     sendMessageToMe(message) {
       usersRef.child(`${this.user.key}/messages`).once("value", snap => {
         usersRef
           .child(`${this.user.key}/messages`)
-          .set([...snap.val(), message]);
+          .set([...snap.val(), { ...message, gelesen: true }]);
       });
     },
     sendMessageToHim(message) {
@@ -201,45 +204,72 @@ export default {
             .set([...snap.val(), message]);
         });
     },
+    isMessageBetweenUserAndCurrentUser(message, newUser) {
+      return (
+        (message.to === this.user.userName &&
+          message.from === newUser.userName) ||
+        (message.to === newUser.userName && message.from === this.user.userName)
+      );
+    },
+    isMessagetoThisUser(message, newUser) {
+      return (
+        message.to === this.user.userName && message.from === newUser.userName
+      );
+    },
     logOut() {}
   },
   computed: {
-    messsagesWithCurrentUser() {
-      let messso = [];
-      usersRef
-        .child(`${this.currentConversationWith.key}/messages`)
-        .once("value", snap => {
-          messo = [...snap.val()].filter(
-            a =>
-              (a.to === this.user.userName &&
-                a.from === this.currentConversationWith.userName) ||
-              (a.to === this.currentConversationWith.userName &&
-                a.from === this.user.userName)
-          );
-        });
-      return messso;
-    },
+    // messsagesWithCurrentUser() {
+    //   let messso = [];
+    //   usersRef
+    //     .child(`${this.currentConversationWith.key}/messages`)
+    //     .once("value", snap => {
+    //       messo = [...snap.val()].filter(
+    //         a =>
+    //           (a.to === this.user.userName &&
+    //             a.from === this.currentConversationWith.userName) ||
+    //           (a.to === this.currentConversationWith.userName &&
+    //             a.from === this.user.userName)
+    //       );
+    //     });
+    //   return messso;
+    // },
     usersTypingToMe() {
       return this.IsLogedIn
         ? this.peopleTyping.filter(a => a.isTypingTo === this.user.userName)
         : [];
     }
+    // messagesBetweenCurrentUserData() {
+    //  return this.user.messages.filter(
+    //     a =>
+    //       (a.to === this.user.userName &&
+    //         a.from === this.currentConversationWith.userName) ||
+    //       (a.to === this.currentConversationWith.userName &&
+    //         a.from === this.user.userName)
+    //   );
+    // }
   },
   watch: {
     currentConversationWith(newUser) {
       if (newUser) {
-        usersRef.child(`${newUser.key}/messages`).on("value", snap => {
+        usersRef.child(`${this.user.key}/messages`).on("value", snap => {
           this.messagesBetweenCurrentUserData = [...snap.val()].filter(
-            a =>
-              (a.to === this.user.userName && a.from === newUser.userName) ||
-              (a.to === newUser.userName && a.from === this.user.userName)
+            message => this.isMessageBetweenUserAndCurrentUser(message, newUser)
           );
+          [...snap.val()].map((message, index) => {
+            if (
+              this.isMessagetoThisUser(message, newUser) &&
+              !message.gelesen
+            ) {
+              usersRef
+                .child(`${this.user.key}/messages`)
+                .child(index)
+                .set({ ...message, gelesen: true });
+            }
+          });
         });
       }
     }
   }
 };
 </script>
-
-<style>
-</style>

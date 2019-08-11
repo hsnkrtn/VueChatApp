@@ -1,5 +1,5 @@
 let newMessage={
-    Id: null,
+    id: null,
     from: null,
     gelesen: false,
     to: null,

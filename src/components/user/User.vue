@@ -1,7 +1,8 @@
 <template>
   <li v-if="user.userName" class="user">
-    <img class="user__avatar" :src="user.avatarUrl || defaultAvatar" alt="resim iste">
+    <img class="user__avatar" :src="user.avatarUrl || defaultAvatar" alt="resim iste" />
     <span :class="genderClass">{{user.userName}}</span>
+    <span>{{unSeenMessagesCount}}</span>
     <span class="user__age">{{age}}</span>
     <span v-if="isTypingToMe">... Typing</span>
   </li>
@@ -18,8 +19,11 @@ export default {
       required: false,
       default: () => ({})
     },
-    isTypingToMe:{
-      type:Boolean
+    isTypingToMe: {
+      type: Boolean
+    },
+    numberOfUnSeenMessages: {
+      type: Number
     }
   },
   computed: {
@@ -39,6 +43,9 @@ export default {
       const currentYear = new Date().getFullYear();
 
       return currentYear - birthYear;
+    },
+    unSeenMessagesCount() {
+      if (this.numberOfUnSeenMessages > 0) return this.numberOfUnSeenMessages;
     }
   }
 };
@@ -85,8 +92,7 @@ export default {
   }
   &:hover {
     cursor: pointer;
-     background-color: #dbf84a;
-
+    background-color: #dbf84a;
   }
 }
 </style>
