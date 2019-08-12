@@ -4,6 +4,7 @@ let newMessage={
     gelesen: false,
     to: null,
     text: null,
-    avatarUrl:null
+    avatarUrl:null,
+    sendingTime:null
 }
 export default newMessage;

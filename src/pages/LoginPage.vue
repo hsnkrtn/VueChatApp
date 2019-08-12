@@ -60,7 +60,7 @@ export default {
         );
 
         let responseUser = resultArray.filter(
-          a => a.userName == user.userName && a.userName == user.password
+          a => a.userName == user.userName && a.password == user.password
         )[0];
         if (responseUser) {
           this.isLogedin = true;

@@ -1,18 +1,32 @@
 <template>
   <div class="chatbox">
-    <div :class="genderClass">
-      <h2 class="chatbox__username">{{currentUser.userName}}</h2>
-      <img class="chatbox__avatar" :src="currentUser.avatarUrl || defaultAvatar" alt="image" />
-    </div>
     <hr />
-
-    <chat-container :currentUser="currentUser" :messages="messagesBetweenCurrentUser" />
+    <div class="col-md-12">
+      <div class="row">
+        <div class="col-md-4">
+          <slot name="users" />
+        </div>
+        <div class="col-md-8">
+          <div :class="genderClass">
+            <h2 class="chatbox__username">{{currentUser.userName}}</h2>
+            <button @click="sendFriendShipRequest(currentUser)">Invite</button>
+            <img class="chatbox__avatar" :src="currentUser.avatarUrl || defaultAvatar" alt="image" />
+          </div>
+          <chat-container
+            :myUserName="myUserName"
+            :currentUser="currentUser"
+            :messages="messagesBetweenCurrentUser"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import manDefaultAvatar from "../../assets/man.png";
 import vrouwDefaultAvatar from "../../assets/vrouw.png";
+import { EventBus } from "../../helpers/EventBus/EventBus";
 import ChatContainer from "./messageContainer/ChatContainer";
 export default {
   components: {
@@ -21,6 +35,10 @@ export default {
   props: {
     currentUser: {
       Type: Object,
+      required: true
+    },
+    myUserName: {
+      Type: String,
       required: true
     },
     messagesBetweenCurrentUser: {
@@ -42,6 +60,11 @@ export default {
         [`${_className}--woman`]: this.currentUser.gender == "Woman",
         [`${_className}--man`]: this.currentUser.gender == "Man"
       };
+    }
+  },
+  methods: {
+    sendFriendShipRequest(user) {
+      EventBus.$emit("addFriendshipRequest", { ...user });
     }
   }
 };

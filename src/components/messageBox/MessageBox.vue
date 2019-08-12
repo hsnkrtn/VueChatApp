@@ -19,7 +19,10 @@ export default {
   methods: {
     sendMessage() {
       if (this.message) EventBus.$emit("typingDone", this.id);
-      EventBus.$emit("messageReadyToSend", this.message);
+      EventBus.$emit("messageReadyToSend", {
+        bericht: this.message,
+        naar: this.currentUser
+      });
       this.reset();
     },
     reset() {
@@ -39,9 +42,9 @@ export default {
       }
     },
     currentUser(newVal) {
-      if (newVal){
-         if (this.message) EventBus.$emit("typingDone", this.id);
-         this.reset();
+      if (newVal) {
+        if (this.message) EventBus.$emit("typingDone", this.id);
+        this.reset();
       }
     }
   },
