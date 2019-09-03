@@ -1,9 +1,13 @@
 <template>
   <li v-if="user.userName" class="user">
     <img class="user__avatar" :src="user.avatarUrl || defaultAvatar" alt="resim iste" />
+<span v-if="isLogedIn" class="glyphicon glyphicon-ok-circle" style="color:brown"></span>
+<span v-else class="glyphicon glyphicon-ok-circle" style="color:white"></span>
     <span :class="genderClass">{{user.userName}}</span>
     <span>{{unSeenMessagesCount}}</span>
     <span class="user__age">{{age}}</span>
+    <span v-if="hasSentAFriendshipRequestToMe"> <i class='fas fa-user-check' style='font-size:20px;color:red'></i></span>
+   
     <span v-if="isTypingToMe">... Typing</span>
   </li>
 </template>
@@ -24,6 +28,12 @@ export default {
     },
     numberOfUnSeenMessages: {
       type: Number
+    },
+    hasSentAFriendshipRequestToMe: {
+      type: Boolean
+    },
+    isLogedIn: {
+      type: Boolean
     }
   },
   computed: {

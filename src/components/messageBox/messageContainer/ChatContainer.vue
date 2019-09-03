@@ -38,8 +38,8 @@ export default {
     },
     displayMessageInfo(message) {
       return message.from === this.myUserName
-        ? `${message.text} ${message.from}`
-        : `${message.from} ${message.text}`;
+        ? `${message.text} ${message.from} ${message.sendingTime}`
+        : `${message.from} ${message.text} ${message.sendingTime}`;
     }
   },
   props: {
@@ -77,13 +77,11 @@ export default {
   &__myMessage {
     text-align: right;
     font-weight: bold;
-    border-radius: 10%;
     background-color: #bada55;
     color: white;
     padding-right: 5px;
   }
   &__othersMessage {
-    border-radius: 10%;
     background-color: LightBlue;
     color: white;
     padding-left: 5px;
