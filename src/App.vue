@@ -31,9 +31,11 @@
           <users
             v-if="IsLogedIn"
             :users="usersProfiles"
-            @currentUserChanged="setCurrentUser"
+            :friendshipRequests="friendshipRequests"
             :usersTypingToMe="usersTypingToMe"
             :unSeenMessages="unSeenMessages"
+            @currentUserChanged="setCurrentUser"
+            :onlineUsers="onlineUsers"
           />
         </template>
       </chat-box>
@@ -48,7 +50,7 @@ import SignUpPage from "./pages/SignUpPage.vue";
 import LoginPage from "./pages/LoginPage.vue";
 import Profile from "./components/profile/Profile.vue";
 import Users from "./components/user/Users";
-import { db, usersRef, storage, typingNow } from "./base";
+import { db, usersRef, storage, typingNow, onlineUsers } from "./base";
 import app from "./base";
 import { pathOr, flatten } from "../node_modules/ramda";
 import ChatBox from "./components/messageBox/ChatBox";
@@ -93,7 +95,8 @@ export default {
       currentConversationWith: null,
       peopleTyping: [],
       messagesBetweenCurrentUserData: [],
-      unSeenMessages: []
+      unSeenMessages: [],
+      onlineUsers: []
     };
   },
   created() {
@@ -113,6 +116,13 @@ export default {
         return Object.assign(e[1]);
       });
       this.peopleTyping = typppnow;
+    });
+    let onlineUsersLocal=[]
+   const online= onlineUsers.on("value", snap => {
+           onlineUsersLocal = Object.entries(snap.val()).map(e => {
+        return  Object.assign(e[1], { key: e[0] });
+      });
+      this.onlineUsers = onlineUsersLocal;
     });
     // get new unread mmessages
   },
@@ -165,9 +175,7 @@ export default {
       this.GetUsers();
       if (this.IsAlreadyAUser(user)) {
         this.IsLogedIn = true;
-        console.log("noluyo lann", user);
       } else {
-        console.log("fdghjkljhgjkl;kjhgjkjhjk");
         this.IsLogedIn = false;
       }
     },
@@ -191,6 +199,8 @@ export default {
           this.user.friendshipRequests = [...snap.val()];
         });
 
+
+      onlineUsers.child(this.user.key).set(getSingleUserData(this.user));
       // usersRef.child(`${this.user.key}/messages`).on('child_added', snap => {
       //  if(!snap.val().gelesen)this.unSeenMessages.push
       //   //this.unSeenMessages = [...snap.val()].filter(a => !a.gelesen);
@@ -256,17 +266,10 @@ export default {
       newFriendShipRequest.to = toPerson.userName;
       newFriendShipRequest.avatarUrl = toPerson.avatarUrl;
       newFriendShipRequest.approved = false;
-      this.sendFriendshipRequestToMe(newFriendShipRequest, this.user.key);
-      this.sendFriendshipRequestToHim(newFriendShipRequest, toPerson.key);
+      this.sendRequestTo(newFriendShipRequest, this.user.key);
+      this.sendRequestTo(newFriendShipRequest, toPerson.key);
     },
-    sendFriendshipRequestToMe(request, key) {
-      usersRef.child(`${key}/friendshipRequests`).once("value", snap => {
-        usersRef
-          .child(`${key}/friendshipRequests`)
-          .set([...snap.val(), request]);
-      });
-    },
-    sendFriendshipRequestToHim(request, key) {
+    sendRequestTo(request, key) {
       usersRef.child(`${key}/friendshipRequests`).once("value", snap => {
         usersRef
           .child(`${key}/friendshipRequests`)
@@ -282,6 +285,9 @@ export default {
     },
     usersProfiles() {
       return this.users.filter(a => a.userName !== this.user.userName);
+    },
+    friendshipRequests() {
+      return this.user.friendshipRequests.filter(a => a.userName !== "public");
     }
   },
   watch: {

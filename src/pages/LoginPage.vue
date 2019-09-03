@@ -1,7 +1,7 @@
 <template>
   <div class="row">
     <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
-      <h1>BekoFisso.com</h1>
+      <h1>InternChat.com</h1>
       <h1>Login</h1>
       <p v-if="isLogedin">u are loggged in !!</p>
       <div class="form-group">
@@ -26,7 +26,6 @@ function getSingleUserData(person) {
   const userName = pathOr(null, ["userName"], person);
   const gender = pathOr(null, ["gender"], person);
   const avatarUrl = pathOr(null, ["avatarUrl"], person);
-  // console.log("#########", userName, gender, avatarUrl, "###########");
   return { userName: userName, gender: gender, avatarUrl: avatarUrl };
 }
 
