@@ -10,7 +10,7 @@ let config = {
 let storage = app.storage();
 let db = app.database();
 let usersRef = db.ref("users");
-let publicMessagesRef = db.ref("publicMessages");
 let typingNow = db.ref("typingNow");
-export {app, storage,db, usersRef, typingNow, getMessages}
+let onlineUsers = db.ref("onlineUsers");
+export {app, storage,db, usersRef, typingNow, getMessages, onlineUsers}
 export default app;

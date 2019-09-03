@@ -7,6 +7,8 @@
       :user="user"
       :isTypingToMe="isTypingToMe(user)"
       :numberOfUnSeenMessages="getNumberOfUnSeenMessages(user)"
+      :hasSentAFriendshipRequestToMe="friendshipRequests.filter(a=>a.from===user.userName).length>0"
+      :isLogedIn="isUserLogedIn(user)"
     />
   </ul>
 </template>
@@ -29,10 +31,18 @@ export default {
       required: false,
       default: () => []
     },
+    friendshipRequests: {
+      type: Array,
+      required: false,
+      default: () => []
+    },
     unSeenMessages: {
       type: Array,
       required: false,
       default: () => []
+    },
+    onlineUsers: {
+      type: Array
     }
   },
   methods: {
@@ -47,6 +57,9 @@ export default {
     },
     getNumberOfUnSeenMessages(user) {
       return this.unSeenMessages.filter(a => a.from === user.userName).length;
+    },
+    isUserLogedIn(user) {
+      return !!this.onlineUsers.find(a => a.key === user.key);
     }
   }
 };
