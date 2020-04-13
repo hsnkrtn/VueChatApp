@@ -7,10 +7,27 @@
           <slot name="users" />
         </div>
         <div class="col-md-8">
-          <div :class="genderClass">
-            <h2 class="chatbox__username">{{currentUser.userName}}</h2>
-            <button @click="sendFriendShipRequest(currentUser)">Invite</button>
-            <img class="chatbox__avatar" :src="currentUser.avatarUrl || defaultAvatar" alt="image" />
+          <div :class="genderClass" v-if="currentUser">
+            <h2 class="chatbox__username">{{ currentUser.userName }}</h2>
+            <template v-if="hasFriendshipRequest">
+              <template v-if="friendshipRequest.approved">
+                <p>Your Friend</p>
+              </template>
+              <template v-else>
+                <p v-if="isRequestFromMe">Pending..</p>
+                <button v-else @click="acceptFriendshipRequest(currentUser)">
+                  Accept Friendship Request
+                </button>
+              </template>
+            </template>
+            <button v-else @click="sendFriendShipRequest()">
+              Invite
+            </button>
+            <img
+              class="chatbox__avatar"
+              :src="currentUser.avatarUrl || defaultAvatar"
+              alt="image"
+            />
           </div>
           <chat-container
             :myUserName="myUserName"
@@ -34,17 +51,32 @@ export default {
   },
   props: {
     currentUser: {
-      Type: Object,
+      type: Object,
       required: true
     },
+    friendshipRequest: {
+      type: Object,
+      required: true,
+      default:undefined
+    },
     myUserName: {
-      Type: String,
+      type: String,
       required: true
     },
     messagesBetweenCurrentUser: {
-      Type: Array,
+      type: Array,
       required: false,
       default: () => []
+    },
+    hasFriendshipRequest: {
+      type: Boolean
+    },
+    isRequestFromMe: {
+      type: Boolean
+    },
+    requestText: {
+      type: String,
+      default: null
     }
   },
   computed: {
@@ -63,8 +95,13 @@ export default {
     }
   },
   methods: {
-    sendFriendShipRequest(user) {
-      EventBus.$emit("addFriendshipRequest", { ...user });
+    sendFriendShipRequest() {
+      this.$store.dispatch("sendAFriendshipRequest");
+      this.$store.dispatch("setMyFriendshipRequests");
+    },
+    acceptFriendshipRequest() {
+      this.$store.dispatch("acceptFriendshipRequest");
+      this.$store.dispatch("setMyFriendshipRequests");
     }
   }
 };
@@ -91,4 +128,3 @@ export default {
   }
 }
 </style>
-

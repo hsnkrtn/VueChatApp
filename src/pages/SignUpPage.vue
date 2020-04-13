@@ -4,17 +4,36 @@
       <h1>Sign Up</h1>
       <div class="form-group">
         <label>Username</label>
-        <input class="form-control" required type="text" v-model="user.userName">
+        <input
+          class="form-control"
+          required
+          type="text"
+          v-model="user.userName"
+        />
       </div>
       <div class="form-group">
         <label>Password</label>
-        <input class="form-control" required type="text" v-model="user.password">
-        <div class="radio" v-for="(gender, index) in this.genderOptions" :key="index">
-          <input type="radio" :id="gender" :value="gender" v-model="user.gender">
-          <label :for="gender">{{gender}}</label>
+        <input
+          class="form-control"
+          required
+          type="text"
+          v-model="user.password"
+        />
+        <div
+          class="radio"
+          v-for="(gender, index) in this.genderOptions"
+          :key="index"
+        >
+          <input
+            type="radio"
+            :id="gender"
+            :value="gender"
+            v-model="user.gender"
+          />
+          <label :for="gender">{{ gender }}</label>
         </div>
         <label for="dateOfBirth"> Birth date:</label>
-        <input type="date" id="dateOfBirth" v-model="user.dateOfBirth">
+        <input type="date" id="dateOfBirth" v-model="user.dateOfBirth" />
         <input
           type="file"
           multiple
@@ -22,7 +41,7 @@
           @change="avatarUpload"
           accept="image/*"
           class="input-file"
-        >
+        />
         <p v-if="isSaving">Uploading Image...</p>
       </div>
       <button
@@ -30,11 +49,15 @@
         type="submit"
         class="btn btn-primary"
         @click="SignUp(user)"
-      >Sign In</button>
-      <button type="submit" class="btn btn-primary" @click="GoToLoginPage">Login</button>
+      >
+        Sign In
+      </button>
+      <button type="submit" class="btn btn-primary" @click="GoToLoginPage">
+        Login
+      </button>
 
-      <p v-if="isAlreadyUser">{{errorMessage}}</p>
-      <hr>
+      <p v-if="isAlreadyUser">{{ errorMessage }}</p>
+      <hr />
     </div>
   </div>
 </template>
@@ -42,7 +65,7 @@
 <script>
 import Guid from "guid";
 import newUser from "../constants/newUser";
-import { storage } from "../base";
+import { storage, usersRef } from "../base";
 export default {
   data() {
     return {
@@ -53,67 +76,31 @@ export default {
       isAlreadyUser: null,
       userSignedUp: false,
       userWantsToSignUp: true,
-      isSaving:false
+      isSaving: false
     };
-  },
-  created() {
-    const customActions = {
-      checkUser: { method: "GET" }
-    };
-    this.resource = this.$resource("users.json", {}, customActions);
   },
   methods: {
     SignUp(user) {
-      
-      this.resource
-        .checkUser()
-        .then(response => {
-          return response.json();
-        })
-        .then(data => {
-          const resultArray = [];
-          for (let key in data) {
-            resultArray.push(data[key]);
-          }
-          this.users = resultArray;
-          if (this.users.some(a => a.userName == user.userName)) {
-            this.isAlreadyUser = true;
-            this.errorMessage =
-              "Username " +
-              user.userName +
-              " already exists, please try another username";
-          } else {
-            this.isAlreadyUser = false;
-            if (!user.gender) user.gender = "NotSpecified";
-            user.id=Guid.raw()
-            this.resource.save({}, user);
-            this.userSignedUp = true;
-            this.$emit("UserSignedUp", true);
-            this.reset();
-          }
-        });
+      if (this.isAlreadyAUser(user)) {
+        this.isAlreadyUser = true;
+        this.errorMessage =
+          "Username " +
+          user.userName +
+          " already exists, please try another username";
+      } else {
+        this.isAlreadyUser = false;
+        if (!user.gender) user.gender = "NotSpecified";
+        user.id = Guid.raw();
+        usersRef.push(user);
+        this.userSignedUp = true;
+        this.reset();
+      }
     },
     uploadFile(e) {
       this.$emit("fileUploaded", e);
-      console.log("app geldi mi ?", storage);
     },
     isAlreadyAUser(user) {
-      this.resource
-        .checkUser()
-        .then(response => {
-          return response.json();
-        })
-        .then(data => {
-          const resultArray = [];
-          for (let key in data) {
-            resultArray.push(data[key]);
-          }
-          this.users = resultArray;
-          if (this.users.some(a => a.userName == user.userName)) {
-            this.isAlreadyUser = true;
-            this.message = "username" + user.userName + "already exists";
-          }
-        });
+      return this.$store.getters.users.some(a => a.userName === user.userName);
     },
     reset() {
       this.user = {};
@@ -123,7 +110,7 @@ export default {
       this.$emit("userWantsToLogin", true);
     },
     avatarUpload(e) {
-      this.isSaving=true;
+      this.isSaving = true;
       const file = e.target.files[0];
       storage
         .ref("userPics/" + file.name)
@@ -133,13 +120,12 @@ export default {
             //this.$emit("avatarSaved", downloadURL);
             this.user.avatarUrl = downloadURL;
           });
-          this.isSaving=false;
+          this.isSaving = false;
         })
-        .catch(err => console.log(err));
+        .catch(err => console.info(err));
     }
   }
 };
 </script>
 
-<style>
-</style>
+<style></style>

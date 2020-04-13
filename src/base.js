@@ -12,5 +12,8 @@ let db = app.database();
 let usersRef = db.ref("users");
 let typingNow = db.ref("typingNow");
 let onlineUsers = db.ref("onlineUsers");
+
+
+
 export {app, storage,db, usersRef, typingNow, getMessages, onlineUsers}
 export default app;

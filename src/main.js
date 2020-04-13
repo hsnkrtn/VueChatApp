@@ -2,11 +2,13 @@ import Vue from 'vue'
 import App from './App.vue'
 import  "bootstrap/dist/css/bootstrap.min.css"
 import VueResource from "vue-resource"
+import store from './store/store'
 Vue.use(VueResource);
 Vue.http.options.root="https://ilovevue-4cad7.firebaseio.com/";
 
 new Vue({
   el: '#app',
+  store,
   render: h => h(App)
 })
     // IsAlreadyAUser(user) {

@@ -1,6 +1,12 @@
 <template>
   <div class="message-box">
-    <textarea class="message-box__text-box" v-model="message" name="Text1" cols="20" rows="2"></textarea>
+    <textarea
+      class="message-box__text-box"
+      v-model="messageText"
+      name="Text1"
+      cols="20"
+      rows="2"
+    ></textarea>
     <button @click="sendMessage">Gonder</button>
   </div>
 </template>
@@ -11,25 +17,24 @@ import Guid from "guid";
 export default {
   data() {
     return {
-      message: null,
+      messageText: null,
       id: null,
-      isTyping: false
+      isTyping: false,
     };
   },
   methods: {
     sendMessage() {
-      if (this.message) EventBus.$emit("typingDone", this.id);
-      EventBus.$emit("messageReadyToSend", {
-        bericht: this.message,
-        naar: this.currentUser
-      });
+      console.log('text from component',this.messageText)
+      this.$store.dispatch("sendMessage", this.messageText);
+      this.$store.dispatch("setMyMessages");
+
       this.reset();
     },
     reset() {
       this.isTyping = false;
-      this.message = null;
+      this.messageText = null;
       this.id = null;
-    }
+    },
   },
   watch: {
     message(newVal) {
@@ -46,15 +51,15 @@ export default {
         if (this.message) EventBus.$emit("typingDone", this.id);
         this.reset();
       }
-    }
+    },
   },
   props: {
     currentUser: {
       type: Object,
       required: false,
-      default: () => ({})
-    }
-  }
+      default: () => ({}),
+    },
+  },
 };
 </script>
 

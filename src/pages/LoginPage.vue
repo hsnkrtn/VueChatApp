@@ -22,12 +22,6 @@
 </template>
 
 <script>
-function getSingleUserData(person) {
-  const userName = pathOr(null, ["userName"], person);
-  const gender = pathOr(null, ["gender"], person);
-  const avatarUrl = pathOr(null, ["avatarUrl"], person);
-  return { userName: userName, gender: gender, avatarUrl: avatarUrl };
-}
 
 import { pathOr } from "../../node_modules/ramda";
 import { usersRef } from "../base";
@@ -55,6 +49,7 @@ export default {
       let resultArray = [];
       usersRef.once("value", snap => {
         resultArray = Object.entries(snap.val()).map(e =>
+        
           Object.assign(e[1], { key: e[0] })
         );
 
@@ -63,10 +58,8 @@ export default {
         )[0];
         if (responseUser) {
           this.isLogedin = true;
-          //const alle = resultArray.map(person => getSingleUserData(person));
           this.$emit("LogedInSuccessed", {
             logednInUser: responseUser
-           // allUsers: alle
           });
           this.errorMessage = null;
         } else {
